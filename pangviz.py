@@ -68,12 +68,13 @@ def parseDateYearMonth(year, month):
 def main():
     """Our cheap unit test main function."""
     #dataFile = "C:\Code\R\IS608-VizAnalytics\FinalProject\Data\Natality, 2007-2013-StateCounty.txt"
-    dataFile = "C:\Code\R\IS608-VizAnalytics\FinalProject\Data\LA-Natality-Combined.csv"
+    #dataFile = "C:\Code\R\IS608-VizAnalytics\FinalProject\Data\LA-Natality-Combined.csv"
+    dataFile = "C:\Code\R\IS608-VizAnalytics\FinalProject\Data\LA-Natality-Census-Combined.csv"
     data = pd.read_table(dataFile, sep=",",
-                         parse_dates={'Date': ["Year Code", "Month Code"]}, date_parser=parseDateYearMonth)
+                         parse_dates={'Date': ["Year.Code", "Month.Code"]}, date_parser=parseDateYearMonth)
     data["Date"] = pd.to_datetime(data["Date"])
-    #data["Date"] = "{0}/{1}/01".format(data["Year"], data["Month"])
-    dataStateSum = data.groupby(["State", "Date", "UnemploymentRate"])["Births"].sum().reset_index()
+
+    dataStateSum = data.groupby(["State", "Date", "UnemploymentRate", "BirthsPer1000Pop"])["Births"].sum().reset_index()
     #dataStates
     print(dataStateSum.head())
 
@@ -84,7 +85,7 @@ def main():
     dtJson = dt.encode()
 
     # Save to a file
-    with open("Output.json", "w") as text_file:
+    with open("C:\Code\R\IS608-VizAnalytics\FinalProject\Data\PanGvizOutput.json", "w") as text_file:
         text_file.write(dtJson)
 
 # This is the main of the program.
