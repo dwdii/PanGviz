@@ -5,6 +5,7 @@ __date__ = '2015-03-23'
 import pandas as pd
 import gviz_data_table as gv
 import numpy
+import os
 from datetime import datetime
 
 def ToGvizDataTable(dataframe):
@@ -69,24 +70,31 @@ def main():
     """Our cheap unit test main function."""
     #dataFile = "C:\Code\R\IS608-VizAnalytics\FinalProject\Data\Natality, 2007-2013-StateCounty.txt"
     #dataFile = "C:\Code\R\IS608-VizAnalytics\FinalProject\Data\LA-Natality-Combined.csv"
-    dataFile = "C:\Code\R\IS608-VizAnalytics\FinalProject\Data\LA-Natality-Census-Combined.csv"
-    data = pd.read_table(dataFile, sep=",",
-                         parse_dates={'Date': ["Year.Code", "Month.Code"]}, date_parser=parseDateYearMonth)
-    data["Date"] = pd.to_datetime(data["Date"])
+    #dataFile = "C:\Code\R\IS608-VizAnalytics\FinalProject\Data\LA-Natality-Census-Combined.csv"
+    #dataFile = "C:\Code\R\IS608-VizAnalytics\FinalProject\Data\LA-Natality-Census-Age-Combined.csv"
+    fileFieldMap = {
+            "C:\Code\R\IS608-VizAnalytics\FinalProject\Data\LA-Natality-Census-Combined.csv" : ["State", "Date", "UnemploymentRate", "BirthsPer1000Pop"],
+            "C:\Code\R\IS608-VizAnalytics\FinalProject\Data\LA-Natality-Census-Age-Combined.csv" : ["Age.of.Mother", "Date", "UnemploymentRate", "BirthsPer1000Pop"]}
 
-    dataStateSum = data.groupby(["State", "Date", "UnemploymentRate", "BirthsPer1000Pop"])["Births"].sum().reset_index()
-    #dataStates
-    print(dataStateSum.head())
+    for k, v in fileFieldMap.iteritems():
+        # Load the data and prep the Date column
+        data = pd.read_table(k, sep=",",
+                             parse_dates={'Date': ["Year.Code", "Month.Code"]}, date_parser=parseDateYearMonth)
+        data["Date"] = pd.to_datetime(data["Date"])
 
-    # Call our helper function
-    dt = ToGvizDataTable(dataStateSum)
+        # State oriented data
+        dataStateSum = data.groupby(v)["Births"].sum().reset_index()
+        print(dataStateSum.head())
 
-    # Convert to the JSON encoding
-    dtJson = dt.encode()
+        # Call our helper function
+        dt = ToGvizDataTable(dataStateSum)
 
-    # Save to a file
-    with open("C:\Code\R\IS608-VizAnalytics\FinalProject\Data\PanGvizOutput.json", "w") as text_file:
-        text_file.write(dtJson)
+        # Convert to the JSON encoding
+        dtJson = dt.encode()
+
+        # Save to a file
+        with open(os.path.splitext(k)[0] + ".json", "w") as text_file:
+            text_file.write(dtJson)
 
 # This is the main of the program.
 if __name__ == "__main__":
