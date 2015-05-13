@@ -74,7 +74,7 @@ def main():
     #dataFile = "C:\Code\R\IS608-VizAnalytics\FinalProject\Data\LA-Natality-Census-Age-Combined.csv"
     fileFieldMap = {
             "C:\Code\R\IS608-VizAnalytics\FinalProject\Data\LA-Natality-Census-Combined.csv" : ["State", "Date", "UnemploymentRate", "BirthsPer1000Pop"],
-            "C:\Code\R\IS608-VizAnalytics\FinalProject\Data\LA-Natality-Census-Age-Combined.csv" : ["Age.of.Mother", "Date", "UnemploymentRate", "BirthsPer1000Pop"]}
+            "C:\Code\R\IS608-VizAnalytics\FinalProject\Data\LA-Natality-Census-Age-Combined.csv" : ["Age.of.Mother", "Date", "UnemploymentRate", "BirthsPer1000Pop"]} # "StateAgeOfMother", "State"
 
     for k, v in fileFieldMap.iteritems():
         # Load the data and prep the Date column
@@ -82,8 +82,9 @@ def main():
                              parse_dates={'Date': ["Year.Code", "Month.Code"]}, date_parser=parseDateYearMonth)
         data["Date"] = pd.to_datetime(data["Date"])
 
-        # State oriented data
+        # Aggregate the births
         dataStateSum = data.groupby(v)["Births"].sum().reset_index()
+        #dataStateSum = data.reset_index()
         print(dataStateSum.head())
 
         # Call our helper function
